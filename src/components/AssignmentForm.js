@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
+import axiosInstance from '../utils/axios-util';
 import './AssignmentForm.css';
 
 const AssignmentForm = () => {
   const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState('');
-  const [studentInfo, setStudentInfo] = useState({
-    name: '',
-    regNo: '',
-    degreeType: 'BS',
-    degreeName: '',
-    sectionName: ''
-  });
+  const [fileName, setFileName] = useState(null)
+  const [courseTitle, setCourseTitle] = useState('')
+  const [courseCode, setCourseCode] = useState('')
+  
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const handleFileChange = (e) => {
@@ -21,29 +18,23 @@ const AssignmentForm = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setStudentInfo((prevInfo) => ({
-      ...prevInfo,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (file) {
-      console.log('File uploaded:', file);
-      console.log('Student information:', studentInfo);
-      setFile(null);
-      setFileName('');
-      setStudentInfo({
-        name: '',
-        regNo: '',
-        degreeType: 'BS',
-        degreeName: '',
-        sectionName: ''
-      });
-      setUploadSuccess(true);
+      const formData = new FormData();
+      formData.append('courseTitle', courseTitle);
+      formData.append('courseCode', courseCode);
+      formData.append('file', file);
+
+      try {
+        await axiosInstance.post('/assignment/upload', formData);
+        console.log('Assignment uploaded successfully');
+      } catch (error) {
+        console.error('Error uploading assignment:', error);
+      }
+    }
+    else {
+      console.error('Please select a file');
     }
   };
 
@@ -57,41 +48,6 @@ const AssignmentForm = () => {
         </div>
       )}
       <form onSubmit={handleSubmit} className="mx-auto mt-2 form-container" >
-        <div className="mb-1">
-          <label htmlFor="name" className="form-label">Student Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="name"
-            name="name"
-            value={studentInfo.name}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="regNo" className="form-label">Registration Number:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="regNo"
-            name="regNo"
-            value={studentInfo.regNo}
-            onChange={handleInputChange}
-          />
-        </div>
-        {/* <div className="mb-2">
-          <label htmlFor="degreeType" className="form-label">Degree Type (BS/MS):</label>
-          <select
-            className="form-select"
-            id="degreeType"
-            name="degreeType"
-            value={studentInfo.degreeType}
-            onChange={handleInputChange}
-          >
-            <option value="BS">BS</option>
-            <option value="MS">MS</option>
-          </select>
-        </div> */}
         <div className="mb-2">
           <label htmlFor="courseTitle" className="form-label">Course title:</label>
           <input
@@ -99,8 +55,8 @@ const AssignmentForm = () => {
             className="form-control"
             id="courseTitle"
             name="courseTitle"
-            value={studentInfo.courseTitle}
-            onChange={handleInputChange}
+            value={courseTitle}
+            onChange={(e) => setCourseTitle(e.target.value)}
           />
         </div>
         <div className="mb-2">
@@ -110,8 +66,8 @@ const AssignmentForm = () => {
             className="form-control"
             id="courseCode"
             name="courseCode"
-            value={studentInfo.courseCode}
-            onChange={handleInputChange}
+            value={courseCode}
+            onChange={(e) => setCourseCode(e.target.value)}
           />
         </div>
         <div className="mb-2">

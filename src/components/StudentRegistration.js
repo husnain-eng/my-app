@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import axiosInstance from '../utils/axios-util';
 import './StudentRegistration.css';
 
 function StudentRegistration() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    regNo: '',
+    registrationNumber: '',
     email: '',
-    phoneNumber: '',
     password: '',
   });
 
@@ -19,10 +19,15 @@ function StudentRegistration() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // You can perform validation here before submitting the data
-    console.log(formData); // Replace this with your data processing logic
+    try {
+      
+      await axiosInstance.post(`/auth/register`, formData);
+      console.log('Registration successful');
+    } catch (error) {
+      console.error('Error registering:', error);
+    }
   };
 
   return (
@@ -55,7 +60,7 @@ function StudentRegistration() {
             <input
               type="text"
               className="form-control"
-              name="regNo"
+              name="registrationNumber"
               onChange={handleChange}
               required
             />
@@ -66,16 +71,6 @@ function StudentRegistration() {
               type="email"
               className="form-control"
               name="email"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Phone Number:</label>
-            <input
-              type="tel"
-              className="form-control"
-              name="phoneNumber"
               onChange={handleChange}
               required
             />

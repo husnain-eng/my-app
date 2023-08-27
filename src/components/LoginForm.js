@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
+import axiosInstance from '../utils/axios-util';
 import './LoginForm.css'
 
 const LoginForm = ({ onLogin }) => {
   const [studentAgNo, setStudentAgNo] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Perform login logic
-    onLogin(); // Call the onLogin prop to update login state
+    try {
+      
+      await axiosInstance.post(`/auth/login`, {
+        registrationNumber: studentAgNo, password
+      }).then(response => {
+        const { token } = response.data;
+
+      // Store the token in localStorage
+      console.log("tokken", token)
+      localStorage.setItem('token', token);
+      })
+      console.log('Login successful');
+      onLogin(); 
+    } catch (error) {
+      console.error('Error logging in:', error);
+    }
   };
 
   return (
